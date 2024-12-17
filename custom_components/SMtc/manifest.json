@@ -1,0 +1,13 @@
+{
+	"domain": "SMtc",
+	"name": "Sequent Microsystems Eight Thermocouples DAQ Integration",
+	"version": "1.0.0",
+	"integration_type": "device",
+	"documentation": "https://github.com/SequentMicrosystems/SMtc-ha",
+	"issue_tracker": "https://github.com/SequentMicrosystems/SMtc-ha",
+	"dependencies": [],
+	"after_dependencies": [],
+	"codeownders": ["3lv"],
+	"config_flow": false,
+	"requirements": ["SMtc>=1.0.0"]
+}
