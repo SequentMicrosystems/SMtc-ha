@@ -2,7 +2,7 @@ FULL_NAME="Eight Thermocouples DAQ"
 LINK="https://sequentmicrosystems.com/products/eight-thermocouples-daq-8-layer-stackable-hat-for-raspberry-pi"
 
 import sm_tc
-API = sm_tc.SMtc(0)
+API = sm_tc.SMtc
 DOMAIN = "SMtc"
 NAME_PREFIX = "smtc"
 SM_MAP = {
