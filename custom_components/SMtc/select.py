@@ -46,13 +46,10 @@ class Select(SelectEntity):
         self._icons = DEFAULT_ICONS | SM_MAP[self._type].get("icon", {})
         self._icon = self._icons["off"]
         self._uom = SM_MAP[self._type].get("uom", "")
-        self._min_value = SM_MAP[self._type]["min_value"]
-        self._max_value = SM_MAP[self._type]["max_value"]
         self._option_map = SM_MAP[self._type]["option_map"]
         self._r_option_map = {value: key for key, value in self._option_map.items()}
         self._options = list(self._option_map.keys())
-        self._step = SM_MAP[self._type]["step"]
-        self._value = 0
+        self._current_option = "B"
         self.__SM__init()
         ### __CUSTOM_SETUP__ START
         ### __CUSTOM_SETUP__ END
@@ -68,16 +65,10 @@ class Select(SelectEntity):
                 def _aux2_SM_get(self, _):
                     return getattr(self, com["get"])()
                 self._SM_get = types.MethodType(_aux2_SM_get, self._SM)
-            if self._step == int(self._step) and self._min_value == int(self._min_value):
-                if len(signature(self._SM_set).parameters) == 1:
-                    def _aux2_SM_set(self, _, value):
-                        getattr(self, com["set"])(int(value))
-                    self._SM_set = types.MethodType(_aux2_SM_set, self._SM)
-            else:
-                if len(signature(self._SM_set).parameters) == 1:
-                    def _aux2_SM_set(self, _, value):
-                        getattr(self, com["set"])(value)
-                    self._SM_set = types.MethodType(_aux2_SM_set, self._SM)
+            if len(signature(self._SM_set).parameters) == 1:
+                def _aux2_SM_set(self, _, value):
+                    getattr(self, com["set"])(value)
+                self._SM_set = types.MethodType(_aux2_SM_set, self._SM)
         else:
             _SM_get = getattr(self._SM, com["get"])
             if len(signature(_SM_get).parameters) == 1:
@@ -89,24 +80,14 @@ class Select(SelectEntity):
                     return _SM_get(self._stack, chan)
                 self._SM_get = _aux_SM_get
             _SM_set = getattr(self._SM, com["set"])
-            if self._step == int(self._step) and self._min_value == int(self._min_value):
-                if len(signature(_SM_set).parameters) == 2:
-                    def _aux3_SM_set(_, value):
-                        return _SM_set(self._stack, int(value))
-                    self._SM_set = _aux3_SM_set
-                else:
-                    def _aux_SM_set(chan, value):
-                        return _SM_set(self._stack, chan, int(value))
-                    self._SM_set = _aux_SM_set
+            if len(signature(_SM_set).parameters) == 2:
+                def _aux3_SM_set(_, value):
+                    return _SM_set(self._stack, value)
+                self._SM_set = _aux3_SM_set
             else:
-                if len(signature(_SM_set).parameters) == 2:
-                    def _aux3_SM_set(_, value):
-                        return _SM_set(self._stack, value)
-                    self._SM_set = _aux3_SM_set
-                else:
-                    def _aux_SM_set(chan, value):
-                        return _SM_set(self._stack, chan, value)
-                    self._SM_set = _aux_SM_set
+                def _aux_SM_set(chan, value):
+                    return _SM_set(self._stack, chan, value)
+                self._SM_set = _aux_SM_set
 
     def update(self):
         time.sleep(self._short_timeout)
@@ -116,10 +97,6 @@ class Select(SelectEntity):
         except Exception as ex:
             _LOGGER.error(DOMAIN + " %s update() failed, %e, %s, %s", self._type, ex, str(self._stack), str(self._chan))
             return
-        if self._value != 0:
-            self._icon = self._icons["on"]
-        else:
-            self._icon = self._icons["off"]
 
     @property
     def unique_id(self):
